@@ -35,8 +35,7 @@ def message_reply(message):
     if message.text == "Играть":
         SentNextRebus(message, db)
     elif message.text == "Список лидеров":
-        for value in SqlBase.DataBase.ViewLeaderBoard(db):
-            bot.send_message(message.chat.id, value)
+        ViewLeaderBoard(db, message)
     else:
         bot.send_message(message.chat.id, 'В любой непонятной ситуации жми /start')
 
@@ -52,8 +51,7 @@ def AnswerValidator(message, nextRebus):
         bot.send_message(message.chat.id, 'Следующий ребус')
         SentNextRebus(message, db)
     elif message.text == "Список лидеров":
-        for value in SqlBase.DataBase.ViewLeaderBoard(db):
-            bot.send_message(message.chat.id, value)
+        ViewLeaderBoard(db, message)
     else:
         bot.send_message(message.chat.id, 'Нет, это неправильный ответ')
         bot.send_message(message.chat.id, 'Следующий ребус')
@@ -64,10 +62,22 @@ def AnswerValidator(message, nextRebus):
 
 def SentNextRebus(message, db):
     nextRebus = SqlBase.DataBase.NextRebus(message.from_user.username, db)
-    bot.send_photo(message.chat.id, nextRebus)
-    msg = bot.send_message(message.chat.id, 'Введи правильный ответ по русски')
+    if nextRebus != '':
+        bot.send_photo(message.chat.id, nextRebus)
+        msg = bot.send_message(message.chat.id, 'Введи правильный ответ по русски')
 
-    bot.register_next_step_handler(msg, AnswerValidator, nextRebus)
+        bot.register_next_step_handler(msg, AnswerValidator, nextRebus)
+    else:
+        bot.send_message(message.chat.id, 'Поздравляю, все ребусы пройдены')
+        ViewLeaderBoard(db, message)
+
+
+def ViewLeaderBoard(db, message):
+    for value in SqlBase.DataBase.SelectLeaderBoard(db):
+        msg = str(value)
+        bot.send_message(message.chat.id, msg)
+
+        print(value)
 
 
 bot.polling(none_stop=True, interval=0)

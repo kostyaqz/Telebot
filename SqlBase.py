@@ -61,16 +61,18 @@ class DataBase:
     def NextRebus(user, db):
         rebusList = []
 
-        for value in db.cursor().execute("SELECT path FROM game where result = 0"):
+        for value in db.cursor().execute("SELECT path FROM game where result = 0 and login = ?", [user]):
             rebusList.append(value)
 
-        #Костыль, чтобы эта херня отдавала нормальную ссылку, а не фиг пойми че
-        result = str(random.choice(rebusList))
-        removeTwoFirstSymbols = result[2:]
-        l = len(removeTwoFirstSymbols)
-        return removeTwoFirstSymbols[:l - 3]
+        if rebusList != []:
+            result = str(random.choice(rebusList))
+            removeTwoFirstSymbols = result[2:]
+            l = len(removeTwoFirstSymbols)
+            return removeTwoFirstSymbols[:l - 3]
+        else:
+            return ''
 
-        #print("Выбор случайного города из списка - ", random.choice(city_list))
+
 
 
     def SelectCorrectAnswer(db, path):
@@ -96,12 +98,10 @@ class DataBase:
     def DropDataBase(db):
         db.cursor().execute("DROP TABLE game")
 
-    def ViewLeaderBoard(db):
+    def SelectLeaderBoard(db):
         leaderBoard = []
 
-        for value in db.cursor().execute("SELECT login, SUM (result) FROM game"):
-            leaderBoard.append(value)
-        for value in leaderBoard:
-            print(value)
+        for value in db.cursor().execute("SELECT login, SUM (result) FROM game group by login order by SUM(result) desc"):
 
+            leaderBoard.append(value)
         return leaderBoard
