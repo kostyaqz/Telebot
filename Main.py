@@ -19,7 +19,7 @@ def start_message(message):
     liderBoard = telebot.types.KeyboardButton("Список лидеров")
 
     SqlBase.DataBase.CreateDataBase(sql, db)
-    SqlBase.DataBase.InsertNewUser(message.from_user.username, sql, db)
+    SqlBase.DataBase.InsertNewUser(message.from_user.username, db)
 
     markup.add(rebus)
     markup.add(liderBoard)
