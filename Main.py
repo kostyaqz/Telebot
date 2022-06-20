@@ -54,12 +54,13 @@ def button_message(message):
 @bot.message_handler(content_types='text')
 def message_reply(message):
     if message.text == "Ребус":
-        nextRebus = SqlBase.DataBase.NextRebus(message.from_user.username, sql)
-        bot.send_message(message.chat.id, 'Фоточка грузится')
-        bot.send_photo(message.chat.id, nextRebus)
-        msg = bot.send_message(message.chat.id, 'Введи правильный ответ по русски')
+        SentNextRebus(message, sql)
+        #nextRebus = SqlBase.DataBase.NextRebus(message.from_user.username, sql)
+       # bot.send_message(message.chat.id, 'Фоточка грузится')
+        #bot.send_photo(message.chat.id, nextRebus)
+       # msg = bot.send_message(message.chat.id, 'Введи правильный ответ по русски')
 
-        bot.register_next_step_handler(msg, after_text_2, nextRebus)
+        #bot.register_next_step_handler(msg, after_text_2, nextRebus)
     #elif message.text == "Исключи лишнее":
         #Заглушка
     #else
@@ -74,35 +75,21 @@ def message_reply(message):
 def after_text_2(message, nextRebus):
 
     print('Второй этап запустился')
-    #correctAnswer = SqlBase.DataBase.SelectCorrectAnswer(sql, nextRebus)
-
     print(SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus))
-    #if message.text.lower() == correctAnswer:
+
     if message.text.lower() == SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus):
-        bot.send_message(message.chat.id, 'Это правильный ответ')
         SqlBase.DataBase.AddPoints(sql, message.from_user.username, nextRebus)
-        msg = bot.send_message(message.chat.id, 'Следующий ребус')
-        RebusCycle(message, sql)
-
-
-
-
-        # bot.register_next_step_handler(msg, after_text_2, SqlBase.DataBase.NextRebus(message.from_user.username, sql))
+        bot.send_message(message.chat.id, 'Это правильный ответ')
     else:
         bot.send_message(message.chat.id, 'Нет, это неправильный ответ')
-        bot.send_message(message.chat.id, 'Ребус')
-        bot.send_message(message.chat.id, 'Следующий ребус')
-        RebusCycle(message, sql)
 
-        #bot.register_next_step_handler(msg, after_text_2, SqlBase.DataBase.NextRebus(message.from_user.username, sql))
+    bot.send_message(message.chat.id, 'Следующий ребус')
+    SentNextRebus(message, sql)
 
 
-
-
-
-def RebusCycle(message, sql):
+def SentNextRebus(message, sql):
     nextRebus = SqlBase.DataBase.NextRebus(message.from_user.username, sql)
-    bot.send_message(message.chat.id, 'Фоточка грузится')
+    #bot.send_message(message.chat.id, 'Фоточка грузится')
     bot.send_photo(message.chat.id, nextRebus)
     msg = bot.send_message(message.chat.id, 'Введи правильный ответ по русски')
 
