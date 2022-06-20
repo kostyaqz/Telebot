@@ -2,13 +2,15 @@ import SqlBase
 import sqlite3
 import telebot
 
-
 bot = telebot.TeleBot("509161010:AAGcICZGPTiQTLJJJlScKszY5uUyo-bByuQ")
 db = sqlite3.connect('server.db', check_same_thread=False)
 sql = db.cursor()
 
 # ВОТ ЭТО НУЖНО УДАЛИТЬ ОБЯЗАТЕЛЬНО
 #to do
+#SqlBase.DataBase.SelectFromDataBase(sql)
+
+
 SqlBase.DataBase.DropDataBase(sql,db)
 print('УДАЛИ ЭТО ОБЯЗАТЕЛЬНО')
 
@@ -24,7 +26,7 @@ def start_message(message):
     markup.add(rebus)
     markup.add(liderBoard)
 
-    bot.send_message(message.chat.id, 'Выбери тему', reply_markup=markup)
+    bot.send_message(message.chat.id, 'Тыкай по кнопке', reply_markup=markup)
 
 
 
@@ -40,7 +42,7 @@ def AnswerValidator(message, nextRebus):
     print(SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus))
 
     if message.text.lower() == SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus):
-        SqlBase.DataBase.AddPoints(sql, message.from_user.username, nextRebus)
+        SqlBase.DataBase.AddPoints(db, message.from_user.username, nextRebus)
         bot.send_message(message.chat.id, 'Это правильный ответ')
     else:
         bot.send_message(message.chat.id, 'Нет, это неправильный ответ')

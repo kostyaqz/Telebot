@@ -61,7 +61,7 @@ class DataBase:
     def NextRebus(user, sql):
         rebusList = []
 
-        for value in sql.execute("SELECT path FROM game"):
+        for value in sql.execute("SELECT path FROM game where result = 0"):
             rebusList.append(value)
 
         #Костыль, чтобы эта херня отдавала нормальную ссылку, а не фиг пойми че
@@ -84,12 +84,8 @@ class DataBase:
         return answer[:l - 4]
 
 
-    def AddPoints (sql, user, path):
-        sql.execute("Update game SET result = 1 where login = ? and path = ?", [user, path])
-
-
-
-
+    def AddPoints (db, user, path):
+        db.cursor().execute("Update game SET result = 1 where login = ? and path = ?", [user, path])
 
     def SelectFromDataBase(sql):
         for value in sql.execute("SELECT * FROM game"):
