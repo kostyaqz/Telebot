@@ -4,14 +4,14 @@ import telebot
 
 bot = telebot.TeleBot("509161010:AAGcICZGPTiQTLJJJlScKszY5uUyo-bByuQ")
 db = sqlite3.connect('server.db', check_same_thread=False)
-sql = db.cursor()
 
 # ВОТ ЭТО НУЖНО УДАЛИТЬ ОБЯЗАТЕЛЬНО
 #to do
-#SqlBase.DataBase.SelectFromDataBase(sql)
+
+SqlBase.DataBase.SelectFromDataBase(db)
 
 
-SqlBase.DataBase.DropDataBase(sql,db)
+#SqlBase.DataBase.DropDataBase(sql,db)
 print('УДАЛИ ЭТО ОБЯЗАТЕЛЬНО')
 
 @bot.message_handler(commands=['start'])
@@ -20,7 +20,7 @@ def start_message(message):
     rebus = telebot.types.KeyboardButton("Играть")
     liderBoard = telebot.types.KeyboardButton("Список лидеров")
 
-    SqlBase.DataBase.CreateDataBase(sql, db)
+    SqlBase.DataBase.CreateDataBase(db)
     SqlBase.DataBase.InsertNewUser(message.from_user.username, db)
 
     markup.add(rebus)
@@ -33,7 +33,12 @@ def start_message(message):
 @bot.message_handler(content_types='text')
 def message_reply(message):
     if message.text == "Играть":
-        SentNextRebus(message, sql)
+        SentNextRebus(message, db)
+    elif message.text == "Список лидеров":
+        for value in SqlBase.DataBase.ViewLeaderBoard(db):
+            bot.send_message(message.chat.id, value)
+    else:
+        bot.send_message(message.chat.id, 'В любой непонятной ситуации жми /start')
 
 
 def AnswerValidator(message, nextRebus):
@@ -44,15 +49,21 @@ def AnswerValidator(message, nextRebus):
     if message.text.lower() == SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus):
         SqlBase.DataBase.AddPoints(db, message.from_user.username, nextRebus)
         bot.send_message(message.chat.id, 'Это правильный ответ')
+        bot.send_message(message.chat.id, 'Следующий ребус')
+        SentNextRebus(message, db)
+    elif message.text == "Список лидеров":
+        for value in SqlBase.DataBase.ViewLeaderBoard(db):
+            bot.send_message(message.chat.id, value)
     else:
         bot.send_message(message.chat.id, 'Нет, это неправильный ответ')
+        bot.send_message(message.chat.id, 'Следующий ребус')
+        SentNextRebus(message, db)
 
-    bot.send_message(message.chat.id, 'Следующий ребус')
-    SentNextRebus(message, sql)
 
 
-def SentNextRebus(message, sql):
-    nextRebus = SqlBase.DataBase.NextRebus(message.from_user.username, sql)
+
+def SentNextRebus(message, db):
+    nextRebus = SqlBase.DataBase.NextRebus(message.from_user.username, db)
     bot.send_photo(message.chat.id, nextRebus)
     msg = bot.send_message(message.chat.id, 'Введи правильный ответ по русски')
 

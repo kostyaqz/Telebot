@@ -2,8 +2,8 @@ import random
 
 class DataBase:
 
-    def CreateDataBase(sql, db):
-        sql.execute("""CREATE TABLE IF NOT EXISTS game (
+    def CreateDataBase(db):
+        db.cursor().execute("""CREATE TABLE IF NOT EXISTS game (
             login VARCHAR,
             path VARCHAR,
             gameType VARCHAR,
@@ -49,7 +49,7 @@ class DataBase:
                     (user, 'https://disk.skbkontur.ru/index.php/apps/files_sharing/publicpreview/sdJHXrM76AR4xPb?x=1920&y=587&a=true&file=26%2520%25D1%2580%25D0%25B5%25D0%25BB%25D0%25B8%25D0%25B7.jpg&scalingup=0', 'rebus', 'релиз', 0),
                     (user, 'https://disk.skbkontur.ru/index.php/apps/files_sharing/publicpreview/my5KKpf39A5TKQo?x=1920&y=587&a=true&file=27%2520%25D0%25BB%25D0%25B5%25D0%25B3%25D0%25B0%25D1%2581%25D0%25B8.jpg&scalingup=0', 'rebus', 'легаси', 0)]
 
-                print("Заполнили данные пользователя")
+                print("Заполнили данные пользователя " + user)
                 db.cursor().executemany("INSERT INTO game (login, path, gameType, correctAnswer, result) VALUES (?, ?, ?, ?, ?)", values)
                 db.commit()
 
@@ -58,10 +58,10 @@ class DataBase:
 
 
 
-    def NextRebus(user, sql):
+    def NextRebus(user, db):
         rebusList = []
 
-        for value in sql.execute("SELECT path FROM game where result = 0"):
+        for value in db.cursor().execute("SELECT path FROM game where result = 0"):
             rebusList.append(value)
 
         #Костыль, чтобы эта херня отдавала нормальную ссылку, а не фиг пойми че
@@ -77,29 +77,31 @@ class DataBase:
 
         trueAnswer = []
 
-        for value in db.cursor().execute("SELECT correctAnswer FROM game where path = ?", [path]):
+        for value in db.cursor().execute("SELECT DISTINCT correctAnswer FROM game where path = ?", [path]):
             trueAnswer.append(value)
-        answer = str(trueAnswer)[3:]
-        l = len(answer)
-        return answer[:l - 4]
+        return str(trueAnswer)[3:-4]
 
 
     def AddPoints (db, user, path):
         db.cursor().execute("Update game SET result = 1 where login = ? and path = ?", [user, path])
+        db.commit()
+        DataBase.SelectFromDataBase(db)
 
-    def SelectFromDataBase(sql):
-        for value in sql.execute("SELECT * FROM game"):
+    def SelectFromDataBase(db):
+        for value in db.cursor().execute("SELECT * FROM game"):
             print(value)
         print('Успех')
 
-    def DeleteDataBase(sql, db):
-        sql.execute("DELETE FROM game")
-        db.commit()
-        print('Да, этот метод типо отработал')
 
-    def DropDataBase(sql, db):
-        sql.execute("DROP TABLE game")
+    def DropDataBase(db):
+        db.cursor().execute("DROP TABLE game")
 
-    def Spamilka(self):
-        print('Some Spome')
+    def ViewLeaderBoard(db):
+        leaderBoard = []
 
+        for value in db.cursor().execute("SELECT login, SUM (result) FROM game"):
+            leaderBoard.append(value)
+        for value in leaderBoard:
+            print(value)
+
+        return leaderBoard
