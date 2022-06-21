@@ -49,7 +49,6 @@ class DataBase:
                     (user, 'https://disk.skbkontur.ru/index.php/apps/files_sharing/publicpreview/sdJHXrM76AR4xPb?x=1920&y=587&a=true&file=26%2520%25D1%2580%25D0%25B5%25D0%25BB%25D0%25B8%25D0%25B7.jpg&scalingup=0', 'rebus', 'релиз', 0),
                     (user, 'https://disk.skbkontur.ru/index.php/apps/files_sharing/publicpreview/my5KKpf39A5TKQo?x=1920&y=587&a=true&file=27%2520%25D0%25BB%25D0%25B5%25D0%25B3%25D0%25B0%25D1%2581%25D0%25B8.jpg&scalingup=0', 'rebus', 'легаси', 0)]
 
-                print("Заполнили данные пользователя " + user)
                 db.cursor().executemany("INSERT INTO game (login, path, gameType, correctAnswer, result) VALUES (?, ?, ?, ?, ?)", values)
                 db.commit()
 
@@ -81,6 +80,7 @@ class DataBase:
 
         for value in db.cursor().execute("SELECT DISTINCT correctAnswer FROM game where path = ?", [path]):
             trueAnswer.append(value)
+
         return str(trueAnswer)[3:-4]
 
 
@@ -92,7 +92,6 @@ class DataBase:
     def SelectFromDataBase(db):
         for value in db.cursor().execute("SELECT * FROM game"):
             print(value)
-        print('Успех')
 
 
     def DropDataBase(db):
@@ -102,6 +101,5 @@ class DataBase:
         leaderBoard = []
 
         for value in db.cursor().execute("SELECT login, SUM (result) FROM game group by login order by SUM(result) desc"):
-
             leaderBoard.append(value)
         return leaderBoard
