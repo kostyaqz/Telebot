@@ -8,10 +8,7 @@ db = sqlite3.connect('server.db', check_same_thread=False)
 # ВОТ ЭТО НУЖНО УДАЛИТЬ ОБЯЗАТЕЛЬНО
 #to do
 
-SqlBase.DataBase.SelectFromDataBase(db)
-
-
-#SqlBase.DataBase.DropDataBase(sql,db)
+SqlBase.DataBase.DropDataBase(db)
 print('УДАЛИ ЭТО ОБЯЗАТЕЛЬНО')
 
 @bot.message_handler(commands=['start'])
@@ -42,9 +39,6 @@ def message_reply(message):
 
 def AnswerValidator(message, nextRebus):
 
-    print('Второй этап запустился')
-    print(SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus))
-
     if message.text.lower() == SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus):
         SqlBase.DataBase.AddPoints(db, message.from_user.username, nextRebus)
         bot.send_message(message.chat.id, 'Это правильный ответ')
@@ -56,8 +50,6 @@ def AnswerValidator(message, nextRebus):
         bot.send_message(message.chat.id, 'Нет, это неправильный ответ')
         bot.send_message(message.chat.id, 'Следующий ребус')
         SentNextRebus(message, db)
-
-
 
 
 def SentNextRebus(message, db):
@@ -76,8 +68,5 @@ def ViewLeaderBoard(db, message):
     for value in SqlBase.DataBase.SelectLeaderBoard(db):
         msg = str(value)
         bot.send_message(message.chat.id, msg)
-
-        print(value)
-
 
 bot.polling(none_stop=True, interval=0)
