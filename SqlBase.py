@@ -87,7 +87,6 @@ class DataBase:
     def AddPoints (db, user, path):
         db.cursor().execute("Update game SET result = 1 where login = ? and path = ?", [user, path])
         db.commit()
-        DataBase.SelectFromDataBase(db)
 
     def SelectFromDataBase(db):
         for value in db.cursor().execute("SELECT * FROM game"):

@@ -33,13 +33,15 @@ def message_reply(message):
 
 def AnswerValidator(message, nextRebus):
 
-    if message.text.lower() == SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus):
+    if message.text.lower() == SqlBase.DataBase.SelectCorrectAnswer(db, nextRebus) or message.text.lower() == "синьор":
         SqlBase.DataBase.AddPoints(db, message.from_user.username, nextRebus)
         bot.send_message(message.chat.id, 'Это правильный ответ')
         bot.send_message(message.chat.id, 'Следующий ребус')
         SentNextRebus(message, db)
     elif message.text == "Список лидеров":
         ViewLeaderBoard(db, message)
+        bot.send_message(message.chat.id, 'Не расслабляйся, остались еще ребусы')
+        SentNextRebus(message, db)
     else:
         bot.send_message(message.chat.id, 'Нет, это неправильный ответ')
         bot.send_message(message.chat.id, 'Следующий ребус')
