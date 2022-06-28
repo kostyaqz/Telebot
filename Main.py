@@ -2,7 +2,7 @@ import SqlBase
 import sqlite3
 import telebot
 
-bot = telebot.TeleBot("509161010:AAGcICZGPTiQTLJJJlScKszY5uUyo-bByuQ")
+bot = telebot.TeleBot("5546767894:AAH8HAnbEJdJmLxRl6STgQK6R3d-k2_0rdE")
 db = sqlite3.connect('server.db', check_same_thread=False)
 
 # ВОТ ЭТО НУЖНО УДАЛИТЬ ОБЯЗАТЕЛЬНО
